@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Occupations Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <header class="app-header">
+      <h1 class="app-title">Your AI Occupations</h1>
+      <div class="header-actions">
+        <button id="customizeBtn" class="btn secondary" type="button">Customize</button>
+      </div>
+    </header>
+
+    <main class="container">
+      <section>
+        <div id="grid" class="grid" aria-live="polite"></div>
+      </section>
+    </main>
+
+    <button id="fabAdd" class="fab" title="Add occupation" aria-label="Add occupation">+</button>
+
+    <dialog id="occupationDialog" class="dialog">
+      <form id="occupationForm" method="dialog" class="dialog-form">
+        <div class="dialog-header">
+          <h3 id="dialogTitle">Add occupation</h3>
+        </div>
+        <div class="dialog-body">
+          <div class="field">
+            <label for="occTitle">Title</label>
+            <input id="occTitle" name="title" type="text" placeholder="e.g., Dermatologist" required>
+          </div>
+          <div class="field">
+            <label for="occEmoji">Icon (emoji or 1-3 chars)</label>
+            <input id="occEmoji" name="emoji" type="text" maxlength="3" placeholder="🧑‍⚕️">
+          </div>
+          <div class="field">
+            <label for="occColor">Accent color</label>
+            <input id="occColor" name="color" type="color" value="#3b82f6">
+          </div>
+          <div class="field">
+            <label for="occAgentUrl">Agent URL (optional)</label>
+            <input id="occAgentUrl" name="agentUrl" type="url" placeholder="https://your-agent.example.com">
+          </div>
+          <input id="occId" name="id" type="hidden">
+        </div>
+        <div class="dialog-footer">
+          <div class="left">
+            <button id="deleteBtn" class="btn danger" type="button" hidden>Delete</button>
+          </div>
+          <div class="right">
+            <button class="btn ghost" value="cancel" type="button" id="cancelBtn">Cancel</button>
+            <button id="saveBtn" class="btn primary" value="default" type="submit">Save</button>
+          </div>
+        </div>
+      </form>
+      <div class="existing-list">
+        <h4>Existing</h4>
+        <ul id="existingList" class="list"></ul>
+      </div>
+    </dialog>
+
+    <script src="app.js"></script>
+  </body>
+</html>
