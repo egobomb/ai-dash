@@ -47,6 +47,7 @@ const DEFAULT_OCCUPATIONS = [
 // Storage keys
 const STORAGE_KEY = 'occupations-dashboard';
 const NOTES_KEY = 'occupation-notes';
+const THEME_KEY = 'dashboard-theme';
 
 // DOM elements
 const grid = document.getElementById('grid');
@@ -57,6 +58,7 @@ const fabAdd = document.getElementById('fabAdd');
 const existingList = document.getElementById('existingList');
 const deleteBtn = document.getElementById('deleteBtn');
 const cancelBtn = document.getElementById('cancelBtn');
+const themeSelect = document.getElementById('themeSelect');
 
 // State
 let occupations = [];
@@ -64,9 +66,28 @@ let editingId = null;
 
 // Initialize app
 function init() {
+  loadTheme();
   loadOccupations();
   renderGrid();
   setupEventListeners();
+}
+
+// Theme management
+function loadTheme() {
+  const savedTheme = localStorage.getItem(THEME_KEY) || 'dark';
+  setTheme(savedTheme);
+  if (themeSelect) {
+    themeSelect.value = savedTheme;
+  }
+}
+
+function setTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem(THEME_KEY, theme);
+}
+
+function switchTheme(theme) {
+  setTheme(theme);
 }
 
 // Load occupations from localStorage or use defaults
@@ -230,6 +251,11 @@ function setupEventListeners() {
   form.onsubmit = handleSubmit;
   deleteBtn.onclick = deleteOccupation;
   cancelBtn.onclick = () => dialog.close();
+  
+  // Theme switcher
+  if (themeSelect) {
+    themeSelect.onchange = (e) => switchTheme(e.target.value);
+  }
   
   // Close dialog on backdrop click
   dialog.onclick = (e) => {

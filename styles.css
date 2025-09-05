@@ -1,3 +1,4 @@
+/* Dark Theme (Default) */
 :root {
   --bg: #0b0f17;
   --panel: #111726;
@@ -6,6 +7,27 @@
   --border: #1b2436;
   --primary: #3b82f6;
   --danger: #ef4444;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --shadow: rgba(0, 0, 0, 0.3);
+  --gradient-start: #0b0f17;
+  --gradient-end: #0c111d;
+}
+
+/* AOL Instant Messenger Theme */
+[data-theme="aol"] {
+  --bg: #c0c0c0;
+  --panel: #d4d0c8;
+  --muted: #808080;
+  --text: #000000;
+  --border: #808080;
+  --primary: #0000ff;
+  --danger: #ff0000;
+  --success: #008000;
+  --warning: #ffa500;
+  --shadow: rgba(0, 0, 0, 0.2);
+  --gradient-start: #c0c0c0;
+  --gradient-end: #d4d0c8;
 }
 
 * { box-sizing: border-box; }
@@ -13,7 +35,7 @@ html, body { height: 100%; }
 body {
   margin: 0;
   font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  background: linear-gradient(180deg, #0b0f17, #0c111d);
+  background: linear-gradient(180deg, var(--gradient-start), var(--gradient-end));
   color: var(--text);
 }
 
@@ -27,8 +49,41 @@ body {
   padding: 16px clamp(16px, 4vw, 32px);
   backdrop-filter: blur(8px);
 }
+
+.agent-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
 .app-title { font-size: clamp(18px, 3vw, 24px); margin: 0; }
-.header-actions { display: flex; gap: 8px; }
+.header-actions { display: flex; gap: 8px; align-items: center; }
+
+.theme-selector {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  padding: 6px 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.theme-selector:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+[data-theme="aol"] .theme-selector {
+  border: 2px outset var(--border);
+  background: var(--panel);
+  font-family: "MS Sans Serif", "Helvetica", "Arial", sans-serif;
+  font-size: 13px;
+  padding: 2px 4px;
+}
+
+[data-theme="aol"] .theme-selector:focus {
+  border: 2px inset var(--border);
+}
 
 .container { padding: 8px clamp(16px, 4vw, 32px) 64px; }
 
@@ -442,6 +497,93 @@ dialog.dialog { border: 1px solid var(--border); border-radius: 14px; padding: 0
   outline: none;
   border-color: var(--primary);
   box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+/* AOL Theme Specific Styling */
+[data-theme="aol"] body {
+  font-family: "MS Sans Serif", "Helvetica", "Arial", sans-serif;
+  font-size: 13px;
+}
+
+[data-theme="aol"] .app-header {
+  background: var(--panel);
+  border-bottom: 2px outset var(--border);
+}
+
+[data-theme="aol"] .card {
+  border: 2px outset var(--border);
+  background: var(--panel);
+}
+
+[data-theme="aol"] .card:hover {
+  border: 2px inset var(--border);
+}
+
+[data-theme="aol"] .btn {
+  border: 2px outset var(--border);
+  background: var(--panel);
+  font-family: "MS Sans Serif", "Helvetica", "Arial", sans-serif;
+  font-size: 13px;
+  padding: 2px 8px;
+}
+
+[data-theme="aol"] .btn:hover {
+  border: 2px inset var(--border);
+}
+
+[data-theme="aol"] .btn.primary {
+  background: var(--primary);
+  color: white;
+  border: 2px outset var(--primary);
+}
+
+[data-theme="aol"] .btn.primary:hover {
+  border: 2px inset var(--primary);
+}
+
+[data-theme="aol"] .chat-container {
+  border: 2px inset var(--border);
+  background: var(--panel);
+}
+
+[data-theme="aol"] .message-text {
+  border: none;
+  font-family: "MS Sans Serif", "Helvetica", "Arial", sans-serif;
+  font-size: 13px;
+}
+
+[data-theme="aol"] .user-message .message-text {
+  border: 1px solid var(--primary);
+}
+
+[data-theme="aol"] .chat-input {
+  border: 2px inset var(--border);
+  background: white;
+  color: black;
+  font-family: "MS Sans Serif", "Helvetica", "Arial", sans-serif;
+  font-size: 13px;
+}
+
+[data-theme="aol"] .dialog {
+  border: 2px outset var(--border);
+  background: var(--panel);
+}
+
+[data-theme="aol"] .dialog-form {
+  border: 2px inset var(--border);
+}
+
+[data-theme="aol"] input, 
+[data-theme="aol"] textarea {
+  border: 2px inset var(--border);
+  background: white;
+  color: black;
+  font-family: "MS Sans Serif", "Helvetica", "Arial", sans-serif;
+  font-size: 13px;
+}
+
+[data-theme="aol"] .status-dot {
+  background: var(--success);
 }
 
 @media (min-width: 960px) {

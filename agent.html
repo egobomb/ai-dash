@@ -16,6 +16,12 @@
         <div class="icon" id="headerIcon" style="background-color: #3b82f6">💼</div>
         <h1 class="app-title" id="headerTitle">Occupation</h1>
       </div>
+      <div class="header-actions">
+        <select id="themeSelect" class="theme-selector">
+          <option value="dark">Dark Mode</option>
+          <option value="aol">AOL Instant Messenger</option>
+        </select>
+      </div>
     </header>
 
     <main class="agent-container">
@@ -78,6 +84,25 @@
         const testAgentBtn = document.getElementById('testAgentBtn');
         const clearChatBtn = document.getElementById('clearChatBtn');
         const connectionStatus = document.getElementById('connectionStatus');
+        const themeSelect = document.getElementById('themeSelect');
+
+        // Theme management
+        function loadTheme() {
+          const savedTheme = localStorage.getItem('dashboard-theme') || 'dark';
+          setTheme(savedTheme);
+          if (themeSelect) {
+            themeSelect.value = savedTheme;
+          }
+        }
+
+        function setTheme(theme) {
+          document.documentElement.setAttribute('data-theme', theme);
+          localStorage.setItem('dashboard-theme', theme);
+        }
+
+        function switchTheme(theme) {
+          setTheme(theme);
+        }
 
         // Initialize page
         function init() {
@@ -85,6 +110,9 @@
             window.location.href = 'index.html';
             return;
           }
+
+          // Load theme first
+          loadTheme();
 
           // Update page title
           document.title = `AI Agent - ${occupation.title}`;
@@ -113,6 +141,11 @@
             }
           };
           testAgentBtn.onclick = testAgentConnection;
+          
+          // Theme switcher
+          if (themeSelect) {
+            themeSelect.onchange = (e) => switchTheme(e.target.value);
+          }
         }
 
 
