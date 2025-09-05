@@ -517,7 +517,6 @@ IMPORTANT: You have access to our conversation history and the user's notes abov
           noteEl.dataset.noteId = note.id;
           noteEl.dataset.color = note.color;
           noteEl.style.backgroundColor = note.color;
-          noteEl.draggable = true;
           
           noteEl.innerHTML = `
             <div class="note-header">
@@ -542,11 +541,6 @@ IMPORTANT: You have access to our conversation history and the user's notes abov
           colorBtn.onclick = () => changeNoteColor(noteEl);
           deleteBtn.onclick = () => deleteNote(noteEl);
           
-          // Drag and drop event listeners
-          noteEl.ondragstart = (e) => handleDragStart(e, noteEl);
-          noteEl.ondragover = (e) => handleDragOver(e);
-          noteEl.ondrop = (e) => handleDrop(e, noteEl);
-          noteEl.ondragend = (e) => handleDragEnd(e, noteEl);
           
           notesContainer.appendChild(noteEl);
         }
@@ -570,62 +564,6 @@ IMPORTANT: You have access to our conversation history and the user's notes abov
           }
         }
 
-        // Drag and drop functionality
-        let draggedElement = null;
-
-        function handleDragStart(e, noteEl) {
-          draggedElement = noteEl;
-          noteEl.classList.add('dragging');
-          e.dataTransfer.effectAllowed = 'move';
-          e.dataTransfer.setData('text/html', noteEl.outerHTML);
-        }
-
-        function handleDragOver(e) {
-          e.preventDefault();
-          e.dataTransfer.dropEffect = 'move';
-          
-          const afterElement = getDragAfterElement(notesContainer, e.clientY);
-          const dragging = document.querySelector('.dragging');
-          
-          if (afterElement == null) {
-            notesContainer.appendChild(dragging);
-          } else {
-            notesContainer.insertBefore(dragging, afterElement);
-          }
-        }
-
-        function handleDrop(e, noteEl) {
-          e.preventDefault();
-          if (draggedElement && draggedElement !== noteEl) {
-            const afterElement = getDragAfterElement(notesContainer, e.clientY);
-            if (afterElement == null) {
-              notesContainer.appendChild(draggedElement);
-            } else {
-              notesContainer.insertBefore(draggedElement, afterElement);
-            }
-            saveNotes();
-          }
-        }
-
-        function handleDragEnd(e, noteEl) {
-          noteEl.classList.remove('dragging');
-          draggedElement = null;
-        }
-
-        function getDragAfterElement(container, y) {
-          const draggableElements = [...container.querySelectorAll('.note:not(.dragging)')];
-          
-          return draggableElements.reduce((closest, child) => {
-            const box = child.getBoundingClientRect();
-            const offset = y - box.top - box.height / 2;
-            
-            if (offset < 0 && offset > closest.offset) {
-              return { offset: offset, element: child };
-            } else {
-              return closest;
-            }
-          }, { offset: Number.NEGATIVE_INFINITY }).element;
-        }
 
         // Initialize the page
         init();
