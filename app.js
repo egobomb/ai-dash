@@ -1,11 +1,47 @@
-// Default occupations with icons and colors
+// Default occupations with icons, colors, and custom instructions
 const DEFAULT_OCCUPATIONS = [
-  { id: 'dermatologist', title: 'Dermatologist', emoji: '🧑‍⚕️', color: '#10b981', agentUrl: '' },
-  { id: 'fitness-coach', title: 'Fitness Coach', emoji: '💪', color: '#f59e0b', agentUrl: '' },
-  { id: 'software-dev', title: 'Software Developer', emoji: '💻', color: '#3b82f6', agentUrl: '' },
-  { id: 'chef', title: 'Chef', emoji: '👨‍🍳', color: '#ef4444', agentUrl: '' },
-  { id: 'teacher', title: 'Teacher', emoji: '👩‍🏫', color: '#8b5cf6', agentUrl: '' },
-  { id: 'lawyer', title: 'Lawyer', emoji: '⚖️', color: '#6b7280', agentUrl: '' }
+  { 
+    id: 'dermatologist', 
+    title: 'Dermatologist', 
+    emoji: '🧑‍⚕️', 
+    color: '#10b981', 
+    instructions: 'You are a board-certified dermatologist. Focus on evidence-based medicine, always ask about patient history and current medications, provide practical treatment recommendations, and emphasize the importance of sun protection and proper skincare routines.' 
+  },
+  { 
+    id: 'fitness-coach', 
+    title: 'Fitness Coach', 
+    emoji: '💪', 
+    color: '#f59e0b', 
+    instructions: 'You are a certified fitness coach and personal trainer. Focus on safe, progressive training methods, ask about fitness goals and limitations, provide practical workout plans, and emphasize proper form and injury prevention.' 
+  },
+  { 
+    id: 'software-dev', 
+    title: 'Software Developer', 
+    emoji: '💻', 
+    color: '#3b82f6', 
+    instructions: 'You are a senior software developer with expertise in multiple programming languages and frameworks. Focus on clean code principles, best practices, debugging techniques, and provide practical coding solutions with explanations.' 
+  },
+  { 
+    id: 'chef', 
+    title: 'Chef', 
+    emoji: '👨‍🍳', 
+    color: '#ef4444', 
+    instructions: 'You are a professional chef with culinary expertise. Focus on cooking techniques, flavor combinations, ingredient substitutions, meal planning, and provide practical recipes with clear instructions and tips.' 
+  },
+  { 
+    id: 'teacher', 
+    title: 'Teacher', 
+    emoji: '👩‍🏫', 
+    color: '#8b5cf6', 
+    instructions: 'You are an experienced educator with expertise in pedagogy and curriculum development. Focus on effective teaching methods, learning strategies, student engagement, and provide practical educational advice and lesson ideas.' 
+  },
+  { 
+    id: 'lawyer', 
+    title: 'Lawyer', 
+    emoji: '⚖️', 
+    color: '#6b7280', 
+    instructions: 'You are a licensed attorney with broad legal knowledge. Focus on legal principles, case law, procedural requirements, and provide practical legal guidance while always recommending consultation with a local attorney for specific legal matters.' 
+  }
 ];
 
 // Storage keys
@@ -91,7 +127,7 @@ function openAgent(occupation) {
     title: occupation.title,
     emoji: occupation.emoji,
     color: occupation.color,
-    agentUrl: occupation.agentUrl || ''
+    instructions: occupation.instructions || ''
   });
   
   window.location.href = `agent.html?${params.toString()}`;
@@ -105,7 +141,7 @@ function showDialog(occupation = null) {
   document.getElementById('occTitle').value = occupation?.title || '';
   document.getElementById('occEmoji').value = occupation?.emoji || '';
   document.getElementById('occColor').value = occupation?.color || '#3b82f6';
-  document.getElementById('occAgentUrl').value = occupation?.agentUrl || '';
+  document.getElementById('occInstructions').value = occupation?.instructions || '';
   document.getElementById('occId').value = occupation?.id || '';
   
   deleteBtn.hidden = !occupation;
@@ -143,7 +179,7 @@ function handleSubmit(e) {
   const title = formData.get('title').trim();
   const emoji = formData.get('emoji').trim();
   const color = formData.get('color');
-  const agentUrl = formData.get('agentUrl').trim();
+  const instructions = formData.get('instructions').trim();
   
   if (!title) return;
   
@@ -152,7 +188,7 @@ function handleSubmit(e) {
     title,
     emoji: emoji || '💼',
     color,
-    agentUrl
+    instructions: instructions || `You are a professional ${title}. Provide helpful, expert advice in your field of specialization.`
   };
   
   if (editingId) {

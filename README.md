@@ -70,3 +70,4 @@ All data is stored locally in your browser using localStorage:
 - Notes: `occupation-notes-{id}`
 
 No server required - everything runs client-side!
+
