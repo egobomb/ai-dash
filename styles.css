@@ -482,19 +482,8 @@ dialog.dialog { border: 1px solid var(--border); border-radius: 14px; padding: 0
   min-height: 120px;
   display: flex;
   flex-direction: column;
-  cursor: move;
 }
 
-.note.dragging {
-  opacity: 0.5;
-  transform: rotate(5deg);
-  z-index: 1000;
-}
-
-.note.drag-over {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
-}
 
 .note:hover {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
@@ -505,6 +494,7 @@ dialog.dialog { border: 1px solid var(--border); border-radius: 14px; padding: 0
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 8px;
+  position: relative;
 }
 
 .note-title {
@@ -518,10 +508,20 @@ dialog.dialog { border: 1px solid var(--border); border-radius: 14px; padding: 0
   margin-right: 8px;
 }
 
+.note-title {
+  position: relative;
+}
+
 .note-title:empty:before {
   content: "Untitled";
   color: #5f6368;
   font-style: italic;
+  position: absolute;
+  pointer-events: none;
+}
+
+.note-title.has-content:before {
+  display: none;
 }
 
 .note-actions {
@@ -529,6 +529,9 @@ dialog.dialog { border: 1px solid var(--border); border-radius: 14px; padding: 0
   gap: 4px;
   opacity: 0;
   transition: opacity 0.2s ease;
+  position: absolute;
+  top: 8px;
+  right: 8px;
 }
 
 .note:hover .note-actions {
@@ -560,12 +563,19 @@ dialog.dialog { border: 1px solid var(--border); border-radius: 14px; padding: 0
   background: transparent;
   flex: 1;
   resize: none;
+  position: relative;
 }
 
 .note-content:empty:before {
   content: "Take a note...";
   color: #5f6368;
   font-style: italic;
+  position: absolute;
+  pointer-events: none;
+}
+
+.note-content.has-content:before {
+  display: none;
 }
 
 /* Dark theme notes */
@@ -586,6 +596,11 @@ dialog.dialog { border: 1px solid var(--border); border-radius: 14px; padding: 0
 [data-theme="dark"] .note-title:empty:before,
 [data-theme="dark"] .note-content:empty:before {
   color: #5f6368 !important;
+}
+
+[data-theme="dark"] .note-title.has-content:before,
+[data-theme="dark"] .note-content.has-content:before {
+  display: none !important;
 }
 
 /* AOL theme notes */
