@@ -447,56 +447,182 @@ dialog.dialog { border: 1px solid var(--border); border-radius: 14px; padding: 0
   50% { opacity: 0.5; }
 }
 
-/* Notes Section Improvements */
+/* Notes Section - Google Keep Style */
 .notes-section {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  overflow: hidden;
+  margin-top: 24px;
 }
 
 .notes-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--border);
-  background: var(--bg);
+  margin-bottom: 16px;
 }
 
 .notes-header h3 {
   margin: 0;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
 }
 
-.notes-controls {
-  display: flex;
-  gap: 8px;
-}
-
 .notes-container {
-  padding: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  padding: 0;
 }
 
-.notes-container textarea {
-  width: 100%;
-  min-height: 120px;
-  resize: vertical;
-  border: 1px solid var(--border);
+.note {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
   border-radius: 8px;
-  padding: 12px;
-  background: var(--bg);
-  color: var(--text);
-  font-family: inherit;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  cursor: move;
+}
+
+.note.dragging {
+  opacity: 0.5;
+  transform: rotate(5deg);
+  z-index: 1000;
+}
+
+.note.drag-over {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.note:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.note-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+.note-title {
+  font-weight: 600;
+  font-size: 16px;
+  color: #202124;
+  outline: none;
+  border: none;
+  background: transparent;
+  flex: 1;
+  margin-right: 8px;
+}
+
+.note-title:empty:before {
+  content: "Untitled";
+  color: #5f6368;
+  font-style: italic;
+}
+
+.note-actions {
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.note:hover .note-actions {
+  opacity: 1;
+}
+
+.note-color-btn,
+.note-delete-btn {
+  background: none;
+  border: none;
+  padding: 4px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s ease;
+}
+
+.note-color-btn:hover,
+.note-delete-btn:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.note-content {
+  color: #3c4043;
   font-size: 14px;
   line-height: 1.5;
+  outline: none;
+  border: none;
+  background: transparent;
+  flex: 1;
+  resize: none;
 }
 
-.notes-container textarea:focus {
-  outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+.note-content:empty:before {
+  content: "Take a note...";
+  color: #5f6368;
+  font-style: italic;
+}
+
+/* Dark theme notes */
+[data-theme="dark"] .note {
+  background: #ffffff;
+  border-color: #e0e0e0;
+  color: #202124;
+}
+
+[data-theme="dark"] .note-title {
+  color: #202124 !important;
+}
+
+[data-theme="dark"] .note-content {
+  color: #3c4043 !important;
+}
+
+[data-theme="dark"] .note-title:empty:before,
+[data-theme="dark"] .note-content:empty:before {
+  color: #5f6368 !important;
+}
+
+/* AOL theme notes */
+[data-theme="aol"] .note {
+  background: var(--panel);
+  border: 2px outset var(--border);
+  font-family: "MS Sans Serif", "Helvetica", "Arial", sans-serif;
+  font-size: 13px;
+}
+
+[data-theme="aol"] .note:hover {
+  border: 2px inset var(--border);
+}
+
+[data-theme="aol"] .note-title {
+  font-family: "MS Sans Serif", "Helvetica", "Arial", sans-serif;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+[data-theme="aol"] .note-content {
+  font-family: "MS Sans Serif", "Helvetica", "Arial", sans-serif;
+  font-size: 13px;
+}
+
+[data-theme="aol"] .note-color-btn,
+[data-theme="aol"] .note-delete-btn {
+  border: 1px outset var(--border);
+  background: var(--panel);
+  font-family: "MS Sans Serif", "Helvetica", "Arial", sans-serif;
+  font-size: 11px;
+  padding: 2px 4px;
+}
+
+[data-theme="aol"] .note-color-btn:hover,
+[data-theme="aol"] .note-delete-btn:hover {
+  border: 1px inset var(--border);
 }
 
 /* AOL Theme Specific Styling */

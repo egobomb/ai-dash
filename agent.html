@@ -57,6 +57,16 @@
           </div>
         </div>
       </section>
+      
+      <section class="notes-section">
+        <div class="notes-header">
+          <h3>Notes</h3>
+          <button id="addNoteBtn" class="btn primary">+ Add Note</button>
+        </div>
+        <div id="notesContainer" class="notes-container">
+          <!-- Notes will be dynamically added here -->
+        </div>
+      </section>
     </main>
 
     <script src="config.js"></script>
@@ -85,6 +95,8 @@
         const clearChatBtn = document.getElementById('clearChatBtn');
         const connectionStatus = document.getElementById('connectionStatus');
         const themeSelect = document.getElementById('themeSelect');
+        const addNoteBtn = document.getElementById('addNoteBtn');
+        const notesContainer = document.getElementById('notesContainer');
 
         // Theme management
         function loadTheme() {
@@ -127,12 +139,14 @@
           testAgentBtn.hidden = false;
           connectionStatus.textContent = "Ready to chat! I'm connected to OpenAI GPT-4.";
 
-          // Load chat history
+          // Load chat history and notes
           loadChatHistory();
+          loadNotes();
 
           // Setup event listeners
           backBtn.onclick = () => window.location.href = 'index.html';
           clearChatBtn.onclick = clearChatHistory;
+          addNoteBtn.onclick = createNewNote;
           sendBtn.onclick = sendMessage;
           chatInput.onkeydown = (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
@@ -422,6 +436,178 @@ IMPORTANT: You have access to our conversation history. You can see and referenc
               testAgentBtn.disabled = false;
             }, 2000);
           });
+        }
+
+        // Notes functionality
+        function loadNotes() {
+          let notes = [];
+          try {
+            const stored = localStorage.getItem(`occupation-notes-${occupation.id}`);
+            if (stored) {
+              // Try to parse as JSON first
+              notes = JSON.parse(stored);
+            }
+          } catch (error) {
+            // If parsing fails, it might be old plain text format
+            console.log('Converting old notes format to new format');
+            const oldText = localStorage.getItem(`occupation-notes-${occupation.id}`);
+            if (oldText && oldText.trim()) {
+              // Convert old single note to new format
+              notes = [{
+                id: Date.now().toString(),
+                title: 'Migrated Note',
+                content: oldText,
+                color: '#ffffff'
+              }];
+            }
+          }
+          
+          notesContainer.innerHTML = '';
+          notes.forEach(note => {
+            createNoteElement(note);
+          });
+        }
+
+        function saveNotes() {
+          const notes = [];
+          const noteElements = notesContainer.querySelectorAll('.note');
+          noteElements.forEach(noteEl => {
+            const id = noteEl.dataset.noteId;
+            const title = noteEl.querySelector('.note-title').textContent;
+            const content = noteEl.querySelector('.note-content').textContent;
+            const color = noteEl.dataset.color || '#ffffff';
+            notes.push({ id, title, content, color });
+          });
+          localStorage.setItem(`occupation-notes-${occupation.id}`, JSON.stringify(notes));
+        }
+
+        function createNewNote() {
+          const note = {
+            id: Date.now().toString(),
+            title: 'New Note',
+            content: 'Click to edit...',
+            color: '#ffffff'
+          };
+          console.log('Creating new note:', note);
+          createNoteElement(note);
+          saveNotes();
+        }
+
+        function createNoteElement(note) {
+          console.log('Creating note element for:', note);
+          const noteEl = document.createElement('div');
+          noteEl.className = 'note';
+          noteEl.dataset.noteId = note.id;
+          noteEl.dataset.color = note.color;
+          noteEl.style.backgroundColor = note.color;
+          noteEl.draggable = true;
+          
+          noteEl.innerHTML = `
+            <div class="note-header">
+              <div class="note-title" contenteditable="true">${note.title}</div>
+              <div class="note-actions">
+                <button class="note-color-btn" title="Change color">🎨</button>
+                <button class="note-delete-btn" title="Delete note">🗑️</button>
+              </div>
+            </div>
+            <div class="note-content" contenteditable="true">${note.content}</div>
+          `;
+          
+          // Add event listeners
+          const titleEl = noteEl.querySelector('.note-title');
+          const contentEl = noteEl.querySelector('.note-content');
+          const colorBtn = noteEl.querySelector('.note-color-btn');
+          const deleteBtn = noteEl.querySelector('.note-delete-btn');
+          
+          titleEl.onblur = saveNotes;
+          contentEl.onblur = saveNotes;
+          
+          colorBtn.onclick = () => changeNoteColor(noteEl);
+          deleteBtn.onclick = () => deleteNote(noteEl);
+          
+          // Drag and drop event listeners
+          noteEl.ondragstart = (e) => handleDragStart(e, noteEl);
+          noteEl.ondragover = (e) => handleDragOver(e);
+          noteEl.ondrop = (e) => handleDrop(e, noteEl);
+          noteEl.ondragend = (e) => handleDragEnd(e, noteEl);
+          
+          notesContainer.appendChild(noteEl);
+        }
+
+        function changeNoteColor(noteEl) {
+          const colors = ['#ffffff', '#f28b82', '#fbbc04', '#fff475', '#ccff90', '#a7ffeb', '#cbf0f8', '#aecbfa', '#d7aefb', '#fdcfe8'];
+          const currentColor = noteEl.dataset.color;
+          const currentIndex = colors.indexOf(currentColor);
+          const nextIndex = (currentIndex + 1) % colors.length;
+          const newColor = colors[nextIndex];
+          
+          noteEl.dataset.color = newColor;
+          noteEl.style.backgroundColor = newColor;
+          saveNotes();
+        }
+
+        function deleteNote(noteEl) {
+          if (confirm('Delete this note?')) {
+            noteEl.remove();
+            saveNotes();
+          }
+        }
+
+        // Drag and drop functionality
+        let draggedElement = null;
+
+        function handleDragStart(e, noteEl) {
+          draggedElement = noteEl;
+          noteEl.classList.add('dragging');
+          e.dataTransfer.effectAllowed = 'move';
+          e.dataTransfer.setData('text/html', noteEl.outerHTML);
+        }
+
+        function handleDragOver(e) {
+          e.preventDefault();
+          e.dataTransfer.dropEffect = 'move';
+          
+          const afterElement = getDragAfterElement(notesContainer, e.clientY);
+          const dragging = document.querySelector('.dragging');
+          
+          if (afterElement == null) {
+            notesContainer.appendChild(dragging);
+          } else {
+            notesContainer.insertBefore(dragging, afterElement);
+          }
+        }
+
+        function handleDrop(e, noteEl) {
+          e.preventDefault();
+          if (draggedElement && draggedElement !== noteEl) {
+            const afterElement = getDragAfterElement(notesContainer, e.clientY);
+            if (afterElement == null) {
+              notesContainer.appendChild(draggedElement);
+            } else {
+              notesContainer.insertBefore(draggedElement, afterElement);
+            }
+            saveNotes();
+          }
+        }
+
+        function handleDragEnd(e, noteEl) {
+          noteEl.classList.remove('dragging');
+          draggedElement = null;
+        }
+
+        function getDragAfterElement(container, y) {
+          const draggableElements = [...container.querySelectorAll('.note:not(.dragging)')];
+          
+          return draggableElements.reduce((closest, child) => {
+            const box = child.getBoundingClientRect();
+            const offset = y - box.top - box.height / 2;
+            
+            if (offset < 0 && offset > closest.offset) {
+              return { offset: offset, element: child };
+            } else {
+              return closest;
+            }
+          }, { offset: Number.NEGATIVE_INFINITY }).element;
         }
 
         // Initialize the page
