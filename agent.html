@@ -326,11 +326,15 @@
           // Build conversation history
           const messages = [];
           
+          // Get current notes
+          const notes = getCurrentNotes();
+          
           // Add system prompt with custom instructions
           const systemPrompt = occupation.instructions || `You are a specialized AI assistant for ${occupation.title}. Provide helpful, professional advice related to this field.`;
-          const fullSystemPrompt = `${systemPrompt}
+          const notesContext = notes.length > 0 ? `\n\nYou also have access to the user's notes for this ${occupation.title} session:\n${notes.map(note => `- ${note.title}: ${note.content}`).join('\n')}` : '';
+          const fullSystemPrompt = `${systemPrompt}${notesContext}
 
-IMPORTANT: You have access to our conversation history. You can see and reference previous questions and answers in this chat. When asked about previous interactions, you should be able to recall and reference them. Always acknowledge when you're referencing something from our previous conversation.`;
+IMPORTANT: You have access to our conversation history and the user's notes above. You can see and reference previous questions, answers, and notes in this chat. When asked about previous interactions or notes, you should be able to recall and reference them. Always acknowledge when you're referencing something from our previous conversation or notes.`;
           messages.push({ role: "system", content: fullSystemPrompt });
           
           // Add chat history (last 20 messages to maintain better context)
@@ -439,6 +443,19 @@ IMPORTANT: You have access to our conversation history. You can see and referenc
         }
 
         // Notes functionality
+        function getCurrentNotes() {
+          const notes = [];
+          const noteElements = notesContainer.querySelectorAll('.note');
+          noteElements.forEach(noteEl => {
+            const title = noteEl.querySelector('.note-title').textContent.trim();
+            const content = noteEl.querySelector('.note-content').textContent.trim();
+            if (title && content && title !== 'Untitled' && content !== 'Take a note...') {
+              notes.push({ title, content });
+            }
+          });
+          return notes;
+        }
+
         function loadNotes() {
           let notes = [];
           try {
