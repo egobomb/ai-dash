@@ -19,23 +19,23 @@
     </header>
 
     <main class="agent-container">
-      <section class="notes">
-        <h3>Your Notes</h3>
-        <textarea id="notesTextarea" placeholder="Add your notes, questions, or context for this AI agent..."></textarea>
-        <div style="display: flex; gap: 8px; margin-top: 8px;">
-          <button id="saveNotes" class="btn primary" type="button">Save Notes</button>
-          <button id="clearNotes" class="btn ghost" type="button">Clear Notes</button>
+      <section class="chat-section">
+        <div class="chat-header">
+          <h3>AI Agent Chat</h3>
+          <div class="chat-controls">
+            <button id="testAgentBtn" class="btn secondary">Test Connection</button>
+            <button id="clearChatBtn" class="btn ghost">Clear Chat</button>
+          </div>
         </div>
-      </section>
-      
-      <section>
-        <h3>AI Agent Chat</h3>
         <div id="chatContainer" class="chat-container">
           <div id="chatMessages" class="chat-messages">
             <div class="message bot-message">
+              <div class="message-avatar">🤖</div>
               <div class="message-content">
-                <strong>AI Assistant:</strong> Hello! I'm your specialized <span id="agentTitle">AI agent</span>. 
-                <span id="connectionStatus">Configure an agent URL in the dashboard to start chatting.</span>
+                <div class="message-text">
+                  <strong>AI Assistant:</strong> Hello! I'm your specialized <span id="agentTitle">AI agent</span>. 
+                  <span id="connectionStatus">Ready to chat! I'm connected to OpenAI GPT-4.</span>
+                </div>
               </div>
             </div>
           </div>
@@ -44,15 +44,10 @@
             <button id="sendBtn" class="btn primary">Send</button>
           </div>
         </div>
-        <div style="margin-top: 16px; padding: 12px; background: var(--panel); border-radius: 8px; border: 1px solid var(--border);">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div>
-              <strong>AI Status:</strong> <span style="color: #10b981;">Connected to OpenAI GPT-4</span>
-            </div>
-            <div style="display: flex; gap: 8px;">
-              <button id="testAgentBtn" class="btn secondary">Test Connection</button>
-              <button id="clearChatBtn" class="btn ghost">Clear Chat</button>
-            </div>
+        <div class="chat-status">
+          <div class="status-indicator">
+            <div class="status-dot"></div>
+            <span>Connected to OpenAI GPT-4</span>
           </div>
         </div>
       </section>
@@ -76,10 +71,7 @@
         const headerIcon = document.getElementById('headerIcon');
         const headerTitle = document.getElementById('headerTitle');
         const agentTitle = document.getElementById('agentTitle');
-        const notesTextarea = document.getElementById('notesTextarea');
         const backBtn = document.getElementById('backBtn');
-        const saveNotes = document.getElementById('saveNotes');
-        const clearNotes = document.getElementById('clearNotes');
         const chatMessages = document.getElementById('chatMessages');
         const chatInput = document.getElementById('chatInput');
         const sendBtn = document.getElementById('sendBtn');
@@ -107,14 +99,11 @@
           testAgentBtn.hidden = false;
           connectionStatus.textContent = "Ready to chat! I'm connected to OpenAI GPT-4.";
 
-          // Load saved notes and chat history
-          loadNotes();
+          // Load chat history
           loadChatHistory();
 
           // Setup event listeners
           backBtn.onclick = () => window.location.href = 'index.html';
-          saveNotes.onclick = saveNotesToStorage;
-          clearNotes.onclick = clearNotesFromStorage;
           clearChatBtn.onclick = clearChatHistory;
           sendBtn.onclick = sendMessage;
           chatInput.onkeydown = (e) => {
@@ -126,11 +115,6 @@
           testAgentBtn.onclick = testAgentConnection;
         }
 
-        // Load notes from localStorage
-        function loadNotes() {
-          const notes = localStorage.getItem(`occupation-notes-${occupation.id}`);
-          notesTextarea.value = notes || '';
-        }
 
         // Load chat history from localStorage
         function loadChatHistory() {
@@ -149,40 +133,28 @@
         // Save chat history to localStorage
         function saveChatHistory() {
           const messages = [];
-          const messageElements = chatMessages.querySelectorAll('.message');
+          const messageElements = chatMessages.querySelectorAll('.message:not(.typing-indicator)');
           messageElements.forEach(msgEl => {
-            const content = msgEl.querySelector('.message-content').textContent;
+            const textEl = msgEl.querySelector('.message-text');
+            const content = textEl ? textEl.textContent : msgEl.querySelector('.message-content').textContent;
             const sender = msgEl.classList.contains('user-message') ? 'user' : 'bot';
             messages.push({ content, sender });
           });
           localStorage.setItem(`occupation-chat-${occupation.id}`, JSON.stringify(messages));
         }
 
-        // Save notes to localStorage
-        function saveNotesToStorage() {
-          localStorage.setItem(`occupation-notes-${occupation.id}`, notesTextarea.value);
-          saveNotes.textContent = 'Saved!';
-          setTimeout(() => {
-            saveNotes.textContent = 'Save Notes';
-          }, 1000);
-        }
-
-        // Clear notes
-        function clearNotesFromStorage() {
-          if (confirm('Clear all notes for this occupation?')) {
-            notesTextarea.value = '';
-            localStorage.removeItem(`occupation-notes-${occupation.id}`);
-          }
-        }
 
         // Clear chat history
         function clearChatHistory() {
           if (confirm('Clear all chat history for this occupation?')) {
             chatMessages.innerHTML = `
               <div class="message bot-message">
+                <div class="message-avatar">🤖</div>
                 <div class="message-content">
-                  <strong>AI Assistant:</strong> Hello! I'm your specialized <span id="agentTitle">AI agent</span>. 
-                  <span id="connectionStatus">Ready to chat! I'm connected to OpenAI GPT-4.</span>
+                  <div class="message-text">
+                    <strong>AI Assistant:</strong> Hello! I'm your specialized <span id="agentTitle">AI agent</span>. 
+                    <span id="connectionStatus">Ready to chat! I'm connected to OpenAI GPT-4.</span>
+                  </div>
                 </div>
               </div>
             `;
@@ -230,10 +202,20 @@
           const messageDiv = document.createElement('div');
           messageDiv.className = `message ${sender}-message`;
           
+          // Add avatar
+          const avatarDiv = document.createElement('div');
+          avatarDiv.className = 'message-avatar';
+          avatarDiv.textContent = sender === 'user' ? '👤' : '🤖';
+          
           const contentDiv = document.createElement('div');
           contentDiv.className = 'message-content';
-          contentDiv.textContent = content;
           
+          const textDiv = document.createElement('div');
+          textDiv.className = 'message-text';
+          textDiv.innerHTML = formatMessage(content);
+          
+          contentDiv.appendChild(textDiv);
+          messageDiv.appendChild(avatarDiv);
           messageDiv.appendChild(contentDiv);
           chatMessages.appendChild(messageDiv);
           
@@ -246,22 +228,42 @@
           }
         }
 
+        // Simple formatting function for better text display
+        function formatMessage(text) {
+          return text
+            .replace(/\n/g, '<br>') // Convert line breaks to HTML
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold text
+            .replace(/\*(.*?)\*/g, '<em>$1</em>') // Italic text
+            .replace(/`(.*?)`/g, '<code>$1</code>') // Inline code
+            .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>'); // Code blocks
+        }
+
         function showTypingIndicator() {
           const typingDiv = document.createElement('div');
           typingDiv.className = 'message bot-message typing-indicator';
           typingDiv.id = 'typing-indicator';
           
-          typingDiv.innerHTML = `
-            <div class="message-content">
-              <span>AI Assistant is typing</span>
-              <div class="typing-dots">
-                <span></span>
-                <span></span>
-                <span></span>
-              </div>
+          const avatarDiv = document.createElement('div');
+          avatarDiv.className = 'message-avatar';
+          avatarDiv.textContent = '🤖';
+          
+          const contentDiv = document.createElement('div');
+          contentDiv.className = 'message-content';
+          
+          const textDiv = document.createElement('div');
+          textDiv.className = 'message-text';
+          textDiv.innerHTML = `
+            <span>AI Assistant is typing</span>
+            <div class="typing-dots">
+              <span></span>
+              <span></span>
+              <span></span>
             </div>
           `;
           
+          contentDiv.appendChild(textDiv);
+          typingDiv.appendChild(avatarDiv);
+          typingDiv.appendChild(contentDiv);
           chatMessages.appendChild(typingDiv);
           chatMessages.scrollTop = chatMessages.scrollHeight;
         }
@@ -274,14 +276,12 @@
         }
 
         async function getAIResponse(userMessage, occupation) {
-          const notes = notesTextarea.value;
-          
           // Build conversation history
           const messages = [];
           
           // Add system prompt with custom instructions
           const systemPrompt = occupation.instructions || `You are a specialized AI assistant for ${occupation.title}. Provide helpful, professional advice related to this field.`;
-          const fullSystemPrompt = `${systemPrompt}${notes ? `\n\nUser's notes for context: ${notes}` : ''}
+          const fullSystemPrompt = `${systemPrompt}
 
 IMPORTANT: You have access to our conversation history. You can see and reference previous questions and answers in this chat. When asked about previous interactions, you should be able to recall and reference them. Always acknowledge when you're referencing something from our previous conversation.`;
           messages.push({ role: "system", content: fullSystemPrompt });
