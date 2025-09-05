@@ -195,7 +195,7 @@
           const message = chatInput.value.trim();
           if (!message) return;
 
-          // Add user message to chat
+          // Add user message to chat and save to history immediately
           addMessage(message, 'user');
           chatInput.value = '';
 
@@ -281,18 +281,23 @@
           
           // Add system prompt with custom instructions
           const systemPrompt = occupation.instructions || `You are a specialized AI assistant for ${occupation.title}. Provide helpful, professional advice related to this field.`;
-          const fullSystemPrompt = `${systemPrompt}${notes ? `\n\nUser's notes for context: ${notes}` : ''}`;
+          const fullSystemPrompt = `${systemPrompt}${notes ? `\n\nUser's notes for context: ${notes}` : ''}
+
+IMPORTANT: You have access to our conversation history. You can see and reference previous questions and answers in this chat. When asked about previous interactions, you should be able to recall and reference them. Always acknowledge when you're referencing something from our previous conversation.`;
           messages.push({ role: "system", content: fullSystemPrompt });
           
-          // Add chat history (last 10 messages to stay within token limits)
+          // Add chat history (last 20 messages to maintain better context)
           const chatHistory = localStorage.getItem(`occupation-chat-${occupation.id}`);
           if (chatHistory) {
             const historyMessages = JSON.parse(chatHistory);
-            // Take last 10 messages to maintain context while staying within limits
-            const recentHistory = historyMessages.slice(-10);
+            // Take last 20 messages to maintain better context
+            const recentHistory = historyMessages.slice(-20);
             recentHistory.forEach(msg => {
               messages.push({ role: msg.sender === 'user' ? 'user' : 'assistant', content: msg.content });
             });
+            console.log(`Loaded ${recentHistory.length} messages from chat history for context`);
+          } else {
+            console.log('No chat history found');
           }
           
           // Add current user message
@@ -302,6 +307,9 @@
             model: "gpt-4o",
             messages: messages
           };
+
+          // Debug: Log the messages being sent to OpenAI
+          console.log('Sending messages to OpenAI:', messages);
 
           try {
             const response = await fetch('https://api.openai.com/v1/chat/completions', {
